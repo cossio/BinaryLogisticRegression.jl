@@ -1,0 +1,3 @@
+module BinaryLogisticRegression
+
+end # module
