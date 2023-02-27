@@ -1,20 +1,22 @@
-using SafeTestsets: @safetestset
+using Test: @test, @testset, @inferred
+using Random: bitrand
+using BinaryLogisticRegression: log_likelihood, log_likelihood_gradient, log_likelihood_hessian,
+    logistic_regression_without_bias
+using Zygote: gradient, hessian
 
-@time @safetestset "util" begin include("util.jl") end
-@time @safetestset "linalg" begin include("linalg.jl") end
-@time @safetestset "onehot" begin include("onehot.jl") end
-@time @safetestset "rbm" begin include("rbm.jl") end
-@time @safetestset "layers" begin include("layers.jl") end
-@time @safetestset "pseudolikelihood" begin include("pseudolikelihood.jl") end
-#@time @safetestset "minibatches" begin include("minibatches.jl") end
-@time @safetestset "infinite_minibatches" begin include("infinite_minibatches.jl") end
-@time @safetestset "initialization" begin include("initialization.jl") end
-@time @safetestset "regularize" begin include("regularize.jl") end
-@time @safetestset "truncnorm" begin include("truncnorm.jl") end
-@time @safetestset "optim" begin include("optim.jl") end
-@time @safetestset "partition" begin include("partition.jl") end
-@time @safetestset "metropolis" begin include("metropolis.jl") end
+X = randn(7, 100)
+y = bitrand(100)
+w = randn(7)
 
-@time @safetestset "zerosum" begin include("gauge/zerosum.jl") end
-@time @safetestset "rescale_hidden" begin include("gauge/rescale_hidden.jl") end
-@time @safetestset "pcd" begin include("pcd.jl") end
+gs = gradient(w) do w
+    log_likelihood(w, X, y)
+end
+
+H = hessian(w) do w
+    log_likelihood(w, X, y)
+end
+
+@test @inferred(log_likelihood_gradient(w, X, y)) ≈ only(gs)
+@test @inferred(log_likelihood_hessian(w, X, y)) ≈ H
+
+@test logistic_regression_without_bias(X, y; algorithm=:lbfgs) ≈ logistic_regression_without_bias(X, y; algorithm=:newton) rtol=1e-4
