@@ -24,7 +24,7 @@ function logistic_regression_without_bias(X::AbstractMatrix, y::AbstractVector{B
 
     f(w) = -log_likelihood(w, X, y) + l2 * sum(w.^2) / 2  # objective function
     g(w) = -log_likelihood_gradient(w, X, y) + l2 .* w  # gradient
-    h(w) = -log_likelihood_hessian(w, X, y) + I  # hessian
+    h(w) = -log_likelihood_hessian(w, X, y) + l2 * I  # hessian
 
     w0 = zeros(size(X, 1))  # initial value
 
