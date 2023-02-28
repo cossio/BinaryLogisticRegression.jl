@@ -17,13 +17,16 @@ function log_likelihood_hessian(w::AbstractVector, X::AbstractMatrix, y::Abstrac
     return H / size(X, 2)
 end
 
-function logistic_regression_without_bias(X::AbstractMatrix, y::AbstractVector{Bool}; l2::Real = 0, algorithm::Symbol=:newton)
+function logistic_regression_without_bias(
+    X::AbstractMatrix, y::AbstractVector{Bool};
+    l1::Real=0, l2::Real=0, algorithm::Symbol=:lbfgs
+)
     @assert size(X, 2) == length(y)
     @assert algorithm ∈ (:lbfgs, :newton)
     w = zeros(size(X, 1))
 
-    f(w) = -log_likelihood(w, X, y) + l2 * sum(w.^2) / 2  # objective function
-    g(w) = -log_likelihood_gradient(w, X, y) + l2 .* w  # gradient
+    f(w) = -log_likelihood(w, X, y) + l1 * sum(abs, w) + l2 * sum(w.^2) / 2  # objective function
+    g(w) = -log_likelihood_gradient(w, X, y) + l1 * sign.(w) + l2 .* w  # gradient
     h(w) = -log_likelihood_hessian(w, X, y) + l2 * I  # hessian
 
     w0 = zeros(size(X, 1))  # initial value
@@ -31,6 +34,7 @@ function logistic_regression_without_bias(X::AbstractMatrix, y::AbstractVector{B
     if algorithm === :lbfgs
         sol = optimize(f, g, w0, LBFGS(); inplace = false)
     elseif algorithm === :newton
+        @assert iszero(l1) # Newton's method does not support L1 regularization
         sol = optimize(f, g, h, w0, Newton(); inplace = false)
     else
         throw(ArgumentError("Unknown algorithm: $algorithm"))

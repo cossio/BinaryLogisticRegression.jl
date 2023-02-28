@@ -10,17 +10,18 @@ using LogExpFunctions: logistic
 X = randn(7, 100)
 y = bitrand(100)
 w = randn(7)
+l1 = rand()
 l2 = rand()
 
 gs = gradient(w) do w
-    log_likelihood(w, X, y) - l2 * sum(w.^2) / 2
+    log_likelihood(w, X, y) - l1 * sum(abs, w) - l2 * sum(w.^2) / 2
 end
 
 H = hessian(w) do w
     log_likelihood(w, X, y) - l2 * sum(w.^2) / 2
 end
 
-@test @inferred(log_likelihood_gradient(w, X, y) - l2 * w) ≈ only(gs)
+@test @inferred(log_likelihood_gradient(w, X, y) - l1 * sign.(w) - l2 * w) ≈ only(gs)
 @test @inferred(log_likelihood_hessian(w, X, y) - l2 * I) ≈ H
 
 @test logistic_regression_without_bias(X, y; algorithm=:lbfgs) ≈ logistic_regression_without_bias(X, y; algorithm=:newton) rtol=1e-4
