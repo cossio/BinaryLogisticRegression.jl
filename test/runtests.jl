@@ -27,5 +27,5 @@ end
 @test logistic_regression_without_bias(X, y; algorithm=:lbfgs) ≈ logistic_regression_without_bias(X, y; algorithm=:newton) rtol=1e-4
 
 w, b = logistic_regression(X, y)
-@test mean(logistic.(X' * w .+ b)) ≈ mean(y)
+@test mean(logistic.(X' * w .+ b)) ≈ mean(y) rtol=1e-8
 @test X * y ≈ X * logistic.(X' * w .+ b) rtol=1e-5

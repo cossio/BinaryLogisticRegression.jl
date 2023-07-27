@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file. The format 
 
 ## Unreleased
 
+## v1.0.0
+
+- Register at https://github.com/cossio/CossioJuliaRegistry.
+
 ## v0.1.0
 
 - This CHANGELOG file.
