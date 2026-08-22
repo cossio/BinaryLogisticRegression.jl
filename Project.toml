@@ -12,7 +12,7 @@ Tullio = "bc48ee85-29a4-5162-ae0b-a64e1601d4bc"
 
 [compat]
 julia = "1.8"
-LogExpFunctions = "0.3"
-Optim = "1"
+LogExpFunctions = "0.3, 1.0"
+Optim = "1, 2.2"
 Tullio = "0.3"
 Statistics = "1"
